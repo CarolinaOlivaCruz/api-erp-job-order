@@ -34,10 +34,24 @@ public class ClientController {
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Integer id) {
-        repository.findById(id)
+        repository
+                .findById(id)
                 .map(client -> {
                     repository.delete(client);
                     return Void.TYPE;
+                })
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @PutMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateById(@PathVariable Integer id, @RequestBody Client clientUpdated) {
+        repository
+                .findById(id)
+                .map(client -> {
+                    clientUpdated.setId(client.getId());
+                    return repository.save(clientUpdated);
                 })
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND));
